@@ -188,6 +188,22 @@
   .tx-refresh{ display:inline-flex; align-items:center; gap:7px; cursor:pointer; border:1px solid var(--stone-300);
     background:#fff; border-radius:10px; padding:8px 14px; font-size:12.5px; font-weight:700; color:var(--stone-700); font-family:inherit; transition:.15s;}
   .tx-refresh:hover{ border-color:var(--terra); color:var(--terra);}
+
+  /* tab subtitles */
+  .tab{ text-align:center; line-height:1.15;}
+  .tab .tsub{ display:block; font-size:9px; font-weight:600; letter-spacing:.01em; opacity:.62; margin-top:1px; text-transform:none;}
+  /* executive summary */
+  .tx-summary{ max-width:1100px; margin:20px auto 0; padding:16px 20px; background:#fff; border:1px solid var(--stone-200);
+    border-left:4px solid var(--terra); border-radius:14px; font-size:14.5px; color:var(--stone-700); line-height:1.6;}
+  .tx-summary b{ color:var(--stone-900); font-weight:750;}
+  /* collapsible visions */
+  .vcard .vsum{ font-size:13px; color:var(--stone-700); line-height:1.5;}
+  .vtoggle{ margin-top:12px; border:0; background:transparent; color:var(--fc,var(--terra)); font-weight:700; font-size:12px; cursor:pointer; font-family:inherit; padding:0;}
+  .vtoggle:hover{ text-decoration:underline;}
+  .k-neutral{ background:var(--stone-100); color:var(--stone-500);}
+  .showall{ display:block; margin:18px auto 0; border:1px solid var(--stone-300); background:#fff; border-radius:10px;
+    padding:9px 18px; font-size:13px; font-weight:700; color:var(--stone-700); cursor:pointer; font-family:inherit;}
+  .showall:hover{ border-color:var(--terra); color:var(--terra);}
 </style>
 </head>
 <body>
@@ -224,8 +240,8 @@
 <div class="topbar">
   <div class="brand"><span class="brand-dot"></span> Tribute Home Care</div>
   <nav class="tabs" id="tabs">
-    <button class="tab sel" data-view="build">The Build</button>
-    <button class="tab" data-view="transformation">Transformation</button>
+    <button class="tab sel" data-view="build" title="Everything we've built, on a timeline">The Build<span class="tsub">What we've built</span></button>
+    <button class="tab" data-view="transformation" title="Vision, roadmap & KPIs — where we're going">Transformation<span class="tsub">Where we're going</span></button>
   </nav>
 </div>
 
@@ -269,12 +285,14 @@
       <input type="file" id="txFile" accept=".xlsx" hidden>
     </div>
   </header>
+  <div class="tx-summary" id="txSummary"></div>
   <div class="tx-kpis" id="txKpis"></div>
-  <div class="section-h"><h2>Leader Vision</h2><p>Where each function is headed by Q2 2027.</p></div>
+  <div class="section-h"><h2>Leader Vision</h2><p>Where each function is headed by Q2 2027. Tap a card to read the full vision.</p></div>
   <div class="vision-grid" id="txVisions"></div>
   <div class="section-h"><h2>Initiatives &amp; Roadmap</h2><p>Every initiative with its KPI and quarterly milestones. Filter by function.</p></div>
   <div class="fnfilter" id="txFilter"></div>
   <div class="init-grid" id="txInits"></div>
+  <button class="showall" id="txShowAll" hidden>Show all 34 initiatives across every function</button>
   <footer>
     Rendered from <code style="font-family:monospace">TributeTransformation_final.xlsx</code> · to refresh, drop the updated workbook into the repo (or hand it to Claude) and the page re-renders.
   </footer>
@@ -596,34 +614,71 @@ const INITS = [
   {fn:"fin",n:"Accelerate Financial Close",lc:"Central",kpi:"Monthly Close (Business Days)",base:"5 days",goal:"3 days",g:"Reduce the monthly close from 5 to 3 days by automating statements, reconciliations, and variance analysis.",q3:"Automate statements (QBO + Claude)",q4:"Automate key reconciliations",q1:"AI variance analysis; close dashboard",q2:""},
 ];
 
+// one-sentence vision summaries (collapsed default)
+const VSUM = {
+  sales:"Turn a productive referral network into a managed, measurable growth engine on the path to $50M.",
+  mkt:"Make AI the operating system for marketing — content, analytics, campaigns, CRM, and partner intelligence.",
+  ops:"Step back from running one market to architect Client Solutions and align every market toward $50M.",
+  sched:"Let an AI agent handle routine coverage so Scheduling Partners become expert care-team builders.",
+  cta:"A predictive talent engine that spots reliable caregivers before hire and removes onboarding friction.",
+  ce:"A custom AI platform that frees MCEs to focus on higher pay, training, and retention.",
+  pc:"Build the people foundation — internal mobility, AI-ready work, and rewards that retain top talent.",
+  sppm:"Build the operating model and real-time intelligence to reach $50M with NOI approaching 15%.",
+  fin:"Data-driven profit, cash-flow planning, and an AI-automated close on the way to a 9% NI margin.",
+};
+
 // ---- render ----
+function hasVal(k){ return k.val && !/^[\s$]*0(\.0+)?\s*[%mM]?\s*$/.test(String(k.val)); }
 function txRenderKpis(){
-  document.getElementById('txKpis').innerHTML = KPIS.map(k=>`
-    <div class="kpi" style="--kc:${k.color}">
+  document.getElementById('txKpis').innerHTML = KPIS.map(k=>{
+    const ok=hasVal(k);
+    const tag = !ok ? `<span class="ktag k-neutral">Awaiting data</span>`
+      : `<span class="ktag ${k.good?'k-good':'k-warn'}">${k.good?'On / above goal':'Below goal'}</span>`;
+    return `<div class="kpi" style="--kc:${k.color}">
       <div class="klabel">${k.label}</div>
-      <div class="kval">${k.val}</div>
+      <div class="kval">${ok?k.val:'–'}</div>
       <div class="kgoal">${k.goal}</div>
-      <span class="ktag ${k.good?'k-good':'k-warn'}">${k.good?'On / above goal':'Below goal'}</span>
-    </div>`).join('');
+      ${tag}
+    </div>`;
+  }).join('');
+}
+function txRenderSummary(){
+  const valued=KPIS.filter(hasVal);
+  const onTrack=valued.filter(k=>k.good).length;
+  const below=valued.filter(k=>!k.good).map(k=>k.label.split(' ·')[0]);
+  const inits=INITS.length, fns=Object.keys(FN).length, paused=INITS.filter(i=>i.paused).length;
+  const tail = below.length ? `${below.join(' and ')} ${below.length>1?'remain':'remains'} below target.` : 'All top-line metrics are on track.';
+  document.getElementById('txSummary').innerHTML =
+    `<b>${onTrack} of ${valued.length} top-line financial KPIs are on or above goal</b> — ${tail.toLowerCase()} ` +
+    `All <b>${fns} departments</b> are mid-transformation across <b>${inits} initiatives</b>, sequenced quarter-by-quarter from Q3 2026 to Q2 2027` +
+    `${paused?`, with ${paused} paused for parental leave`:''}.`;
 }
 function txRenderVisions(){
-  document.getElementById('txVisions').innerHTML = VISIONS.map(v=>{
+  document.getElementById('txVisions').innerHTML = VISIONS.map((v,idx)=>{
     const f=FN[v.fn];
     return `<div class="vcard" style="--fc:${f.color}">
       <div class="vfunc">${f.name}</div>
       <h3>${f.leader}</h3>
       <div class="vrole">${f.name} Leader</div>
-      <div class="vtext">${v.vision}</div>
-      ${v.succ?`<div class="vsucc"><b>Success by Q2 2027</b>${v.succ}</div>`:''}
+      <div class="vsum">${VSUM[v.fn]||''}</div>
+      <div class="vfull" id="vf${idx}" hidden>
+        <div class="vtext" style="margin-top:10px">${v.vision}</div>
+        ${v.succ?`<div class="vsucc"><b>Success by Q2 2027</b>${v.succ}</div>`:''}
+      </div>
+      <button class="vtoggle" data-i="${idx}">Read full vision ↓</button>
     </div>`;
   }).join('');
+  document.querySelectorAll('.vtoggle').forEach(b=>b.addEventListener('click',()=>{
+    const el=document.getElementById('vf'+b.dataset.i); const open=!el.hidden; el.hidden=open;
+    b.textContent = open ? 'Read full vision ↓' : 'Hide ↑';
+  }));
 }
-let txFilter='all';
+let txFilter='sales';   // default to a single function, not all
 function txRenderFilter(){
   const keys=Object.keys(FN);
   document.getElementById('txFilter').innerHTML =
-    `<span class="fchip ${txFilter==='all'?'sel':''}" data-fn="all">All functions</span>` +
-    keys.map(k=>`<span class="fchip ${txFilter===k?'sel':''}" data-fn="${k}"><span class="fdot" style="background:${FN[k].color}"></span>${FN[k].name}</span>`).join('');
+    keys.map(k=>`<span class="fchip ${txFilter===k?'sel':''}" data-fn="${k}"><span class="fdot" style="background:${FN[k].color}"></span>${FN[k].name}</span>`).join('') +
+    `<span class="fchip ${txFilter==='all'?'sel':''}" data-fn="all">All functions</span>`;
   document.querySelectorAll('#txFilter .fchip').forEach(c=>c.addEventListener('click',()=>{ txFilter=c.dataset.fn; txRenderFilter(); txRenderInits(); }));
 }
 function q(label,txt,color){
@@ -652,8 +707,11 @@ function txRenderInits(){
       ${i.note?`<div style="margin-top:9px;font-size:10.5px;color:#b5654a;font-weight:700">⚠ ${i.note}</div>`:''}
     </div>`;
   }).join('');
+  const btn=document.getElementById('txShowAll');
+  btn.hidden = txFilter==='all';
 }
-function txRenderAll(){ txRenderKpis(); txRenderVisions(); txRenderFilter(); txRenderInits(); }
+document.getElementById('txShowAll').addEventListener('click',()=>{ txFilter='all'; txRenderFilter(); txRenderInits(); window.scrollTo({top:document.getElementById('txInits').offsetTop-80,behavior:'smooth'}); });
+function txRenderAll(){ txRenderSummary(); txRenderKpis(); txRenderVisions(); txRenderFilter(); txRenderInits(); }
 txRenderAll();
 
 // ---- tab switching ----
@@ -698,27 +756,24 @@ function parseWorkbook(buf,srcName){
   const wb=XLSX.read(new Uint8Array(buf),{type:'array'});
   const sheet=wb.SheetNames.find(n=>/kpi/i.test(n))||wb.SheetNames[wb.SheetNames.length-1];
   const rows=XLSX.utils.sheet_to_json(wb.Sheets[sheet],{header:1,blankrows:false});
-  const num=s=>{const m=String(s).replace(/[^0-9.\-]/g,'');return m&&!isNaN(parseFloat(m))?parseFloat(m):null;};
-  const lastNum=row=>{for(let j=row.length-1;j>=0;j--){const n=num(row[j]); if(n!=null)return n;}return null;};
+  // collect ALL numbers in a row (not just the last — that caused mangled/concatenated values)
+  const nums=row=>row.map(c=>{ if(typeof c==='number') return c; const s=String(c).replace(/[, $]/g,''); return /^-?\d+(\.\d+)?%?$/.test(s)?parseFloat(s):null; }).filter(n=>n!=null);
+  const pct=v=>{ v=Math.abs(v)<=1?v*100:v; return v; };
+  // pick the value in [lo,hi] closest to the right side of the row (latest month)
+  const pick=(row,lo,hi)=>{ const ns=nums(row).filter(n=>n>=lo&&n<=hi); return ns.length?ns[ns.length-1]:null; };
   let hits=0;
-  // company financial KPI cards
   rows.forEach(row=>{
     const label=row.map(c=>String(c||'')).join(' ').toLowerCase();
-    const v=lastNum(row); if(v==null) return;
-    const setK=(i,f)=>{KPIS[i].val=f(v); hits++;};
-    if(/net income/.test(label)) setK(3,x=>(x<1?x*100:x).toFixed(1)+'%');
-    else if(/gross margin/.test(label)) setK(1,x=>(x<1?x*100:x).toFixed(1)+'%');
-    else if(/contribution margin/.test(label)) setK(2,x=>(x<1?x*100:x).toFixed(1)+'%');
-    else if(/revenue/.test(label)&&v>1000) setK(0,x=>'$'+(x/1e6).toFixed(1)+'M');
+    const set=(i,val)=>{ if(val!=null){ KPIS[i].val=val; hits++; } };
+    if(/net income/.test(label)){ const v=pick(row,-1,100); const p=v!=null?pct(v):null; if(p!=null&&p>=-50&&p<=50) set(3,p.toFixed(1)+'%'); }
+    else if(/gross margin/.test(label)){ const v=pick(row,-1,100); const p=v!=null?pct(v):null; if(p!=null&&p>=10&&p<=80) set(1,p.toFixed(1)+'%'); }
+    else if(/contribution margin/.test(label)){ const v=pick(row,-1,100); const p=v!=null?pct(v):null; if(p!=null&&p>=0&&p<=70) set(2,p.toFixed(1)+'%'); }
+    else if(/revenue/.test(label)){ const v=pick(row,1e6,3e8); if(v!=null) set(0,'$'+(v/1e6).toFixed(1)+'M'); }
   });
-  // per-initiative "current" actuals, matched by KPI metric name
-  INITS.forEach(it=>{
-    const key=it.kpi.toLowerCase().replace(/[^a-z0-9 ]/g,'').slice(0,18);
-    const hit=rows.find(r=>r.map(c=>String(c||'')).join(' ').toLowerCase().includes(key));
-    if(hit){ const v=lastNum(hit); if(v!=null){ it.cur=(/%|rate|margin/i.test(it.kpi)&&v<1?(v*100).toFixed(1)+'%':String(v)); } }
-  });
-  txRenderKpis(); txRenderInits();
-  asOf.textContent=(hits?`Live — refreshed from ${srcName}`:`Loaded ${srcName} (KPIs not auto-mapped)`)+` · ${new Date().toLocaleString()}`;
+  // NOTE: per-initiative actuals are intentionally NOT auto-mapped — the source layout is
+  // inconsistent and produced malformed values; the curated "Now" figures stay authoritative.
+  txRenderKpis(); txRenderSummary();
+  asOf.textContent=(hits?`Live — ${hits} KPI${hits>1?'s':''} refreshed from ${srcName}`:`Loaded ${srcName}, but the financial KPIs couldn't be auto-located`)+` · ${new Date().toLocaleString()}`;
   return hits;
 }
 async function refreshLive(){
