@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Build — Tribute Project Web</title>
+<style>
+  :root{
+    --stone-50:#faf8f5; --stone-100:#f4f0ea; --stone-200:#e8e1d7; --stone-300:#d6ccbd;
+    --stone-500:#9a8c79; --stone-700:#5f5547; --stone-900:#2c261d;
+    --terra:#b5654a; --terra-soft:#e9c9bd;
+    --line:#cdbfae;
+    /* category accents */
+    --c-platform:#b5654a;   --c-platform-bg:#f6e3da;
+    --c-dashboard:#3f7d6e;  --c-dashboard-bg:#dceae4;
+    --c-ai:#6b5ca5;         --c-ai-bg:#e4dff1;
+    --c-automation:#3b6ea5; --c-automation-bg:#dce8f3;
+    --c-personal:#a64d6f;   --c-personal-bg:#f3dce6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;
+    background:
+      radial-gradient(1200px 500px at 80% -10%, #fdf4ec 0%, transparent 60%),
+      radial-gradient(900px 600px at -10% 30%, #f3ede4 0%, transparent 55%),
+      var(--stone-50);
+    color:var(--stone-900); line-height:1.5; -webkit-font-smoothing:antialiased;
+    padding-bottom:80px;
+  }
+  header{
+    max-width:1100px; margin:0 auto; padding:56px 24px 14px;
+  }
+  .eyebrow{
+    font-size:12px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--terra); font-weight:700; margin-bottom:10px;
+  }
+  h1{
+    font-size:clamp(30px,5vw,46px); line-height:1.05; font-weight:800;
+    letter-spacing:-.02em; color:var(--stone-900);
+  }
+  h1 span{color:var(--terra)}
+  .sub{ margin-top:14px; max-width:620px; color:var(--stone-700); font-size:16px;}
+  .stats{ display:flex; gap:28px; margin-top:22px; flex-wrap:wrap;}
+  .stat b{ display:block; font-size:26px; font-weight:800; color:var(--stone-900); line-height:1;}
+  .stat span{ font-size:12px; color:var(--stone-500); letter-spacing:.04em;}
+
+  /* legend / filters */
+  .filters{
+    max-width:1100px; margin:26px auto 0; padding:0 24px;
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+  }
+  .chip{
+    display:inline-flex; align-items:center; gap:8px; cursor:pointer; user-select:none;
+    border:1px solid var(--stone-200); background:#fff; padding:7px 14px; border-radius:999px;
+    font-size:13px; font-weight:600; color:var(--stone-700); transition:.15s;
+  }
+  .chip .dot{ width:10px; height:10px; border-radius:50%;}
+  .chip:hover{ border-color:var(--line); transform:translateY(-1px);}
+  .chip.sel{ background:var(--stone-900); color:#fff; border-color:var(--stone-900);}
+  .chip.sel .dot{ box-shadow:0 0 0 2px rgba(255,255,255,.35);}
+
+  /* timeline */
+  .timeline{ max-width:1100px; margin:38px auto 0; padding:0 24px; position:relative;}
+  .spine{ position:absolute; left:50%; top:0; bottom:0; width:2px;
+    background:linear-gradient(var(--line),var(--stone-200)); transform:translateX(-50%);}
+  .month{ position:relative; text-align:center; margin:10px 0 26px;}
+  .month span{
+    display:inline-block; background:var(--stone-900); color:var(--stone-50);
+    font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    padding:6px 16px; border-radius:999px; position:relative; z-index:2;
+  }
+  .row{ position:relative; display:flex; margin:0 0 18px; min-height:10px;}
+  .row.left{ justify-content:flex-start;}
+  .row.right{ justify-content:flex-end;}
+  .card{
+    position:relative; width:calc(50% - 36px); background:#fff;
+    border:1px solid var(--stone-200); border-radius:16px; padding:18px 20px;
+    box-shadow:0 1px 2px rgba(60,50,35,.04), 0 8px 24px -16px rgba(60,50,35,.25);
+    transition:.18s; text-decoration:none; color:inherit; display:block;
+    border-left:4px solid var(--accent,var(--line));
+  }
+  .card:hover{ transform:translateY(-3px); box-shadow:0 4px 10px rgba(60,50,35,.08), 0 18px 40px -20px rgba(60,50,35,.4); border-color:var(--accent);}
+  /* connector from card to spine */
+  .row .card::after{
+    content:""; position:absolute; top:26px; width:38px; height:2px; background:var(--accent,var(--line)); opacity:.5;
+  }
+  .row.left .card::after{ right:-38px;}
+  .row.right .card::after{ left:-38px;}
+  .row .card::before{
+    content:""; position:absolute; top:21px; width:12px; height:12px; border-radius:50%;
+    background:#fff; border:2px solid var(--accent,var(--line)); z-index:2;
+  }
+  .row.left .card::before{ right:-44px;}
+  .row.right .card::before{ left:-44px;}
+
+  .card .top{ display:flex; align-items:center; gap:8px; margin-bottom:7px; flex-wrap:wrap;}
+  .card h3{ font-size:16.5px; font-weight:750; letter-spacing:-.01em; line-height:1.2; flex:1; min-width:60%;}
+  .badge{ font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; padding:3px 8px; border-radius:6px;}
+  .b-live{ background:#dff0e4; color:#2f7d50;}
+  .b-local{ background:#efe7da; color:#8a6d3b;}
+  .b-proto{ background:#e7e0f3; color:#6b5ca5;}
+  .b-pending{ background:#f6e0d8; color:#b5654a;}
+  .cat-tag{ font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--accent);}
+  .card p{ font-size:13.5px; color:var(--stone-700); margin:2px 0 12px;}
+  .meta{ display:flex; flex-direction:column; gap:4px; font-size:11.5px; color:var(--stone-500);}
+  .meta code{ font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11px; color:var(--stone-700); background:var(--stone-100); padding:1px 6px; border-radius:5px;}
+  .link{ display:inline-flex; align-items:center; gap:5px; margin-top:11px; font-size:12.5px; font-weight:700; color:var(--accent);}
+  .link.dead{ color:var(--stone-500); font-weight:600;}
+  .arrow{ transition:.15s;}
+  .card:hover .arrow{ transform:translateX(3px);}
+
+  /* hidden state */
+  .row.hide{ display:none;}
+  .month.hide{ display:none;}
+
+  footer{ max-width:1100px; margin:50px auto 0; padding:0 24px; color:var(--stone-500); font-size:12.5px; text-align:center;}
+
+  @media(max-width:760px){
+    .spine{ left:18px;}
+    .row{ justify-content:flex-end !important;}
+    .card{ width:calc(100% - 44px);}
+    .row .card::after{ left:-26px !important; right:auto !important; width:26px;}
+    .row .card::before{ left:-32px !important; right:auto !important;}
+    .month{ text-align:left; padding-left:0;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Andrew Dobson · Tribute Home Care</div>
+  <h1>The Build.<br><span>Everything, on a timeline.</span></h1>
+  <p class="sub">A living web of the tools, dashboards, and platforms shipped over the past months — what each one does, where it lives, and a link to the live version when there is one.</p>
+  <div class="stats">
+    <div class="stat"><b id="s-total">0</b><span>PROJECTS</span></div>
+    <div class="stat"><b id="s-live">0</b><span>LIVE</span></div>
+    <div class="stat"><b id="s-local">0</b><span>LOCAL</span></div>
+  </div>
+</header>
+
+<div class="filters" id="filters">
+  <span class="chip" data-cat="all">All</span>
+  <span class="chip" data-cat="ai"><span class="dot" style="background:var(--c-ai)"></span>AI Platforms</span>
+  <span class="chip" data-cat="platform"><span class="dot" style="background:var(--c-platform)"></span>Data &amp; Infra</span>
+  <span class="chip" data-cat="dashboard"><span class="dot" style="background:var(--c-dashboard)"></span>Dashboards</span>
+  <span class="chip" data-cat="automation"><span class="dot" style="background:var(--c-automation)"></span>Automation &amp; Process</span>
+</div>
+
+<div class="timeline" id="timeline">
+  <div class="spine"></div>
+</div>
+
+<footer>
+  Generated 2026-06-29 · Hover a node to lift it, click to open its live home. Edit the <code style="font-family:monospace">PROJECTS</code> array in this file to add the next thing you build.
+</footer>
+
+<script>
+const CATS = {
+  ai:        {label:"AI Platform",        accent:"var(--c-ai)"},
+  platform:  {label:"Data & Infra",       accent:"var(--c-platform)"},
+  dashboard: {label:"Dashboard",          accent:"var(--c-dashboard)"},
+  automation:{label:"Automation",         accent:"var(--c-automation)"},
+  personal:  {label:"Personal",           accent:"var(--c-personal)"},
+};
+
+// status: live | local | proto | pending
+const PROJECTS = [
+  {date:"2025-09", cat:"automation", name:"Scheduling Suite",
+   purpose:"Where it all started — the original Tribute scheduling tool, the first crack at automating the scheduling problem by hand.",
+   home:"andrewdobsonn-cell/Tribute-Scheduling · private repo", status:"local", url:null},
+
+  {date:"2025-10", cat:"automation", name:"Availability Analyzer",
+   purpose:"The first availability tool — reasoning about who's actually free to work. Deployed live on Vercel.",
+   home:"andrewdobsonn-cell/Availability-Analyzer · Vercel", status:"live",
+   url:"https://availability-analyzer.vercel.app"},
+
+  {date:"2026-02", cat:"automation", name:"Availability Analyzer v2",
+   purpose:"Second pass at the availability tool — refined logic on the road to the production availability engine.",
+   home:"andrewdobsonn-cell/Availability-Analyzer2 · public repo", status:"local", url:null},
+
+  {date:"2026-03", cat:"dashboard", name:"Caregiver Utilization",
+   purpose:"The utilization analysis — the metric, thresholds, and reporting that became the backbone of the KSF quality story. Live on Vercel.",
+   home:"andrewdobsonn-cell/tribute-utilization · Vercel", status:"live",
+   url:"https://tribute-utilization.vercel.app"},
+
+  {date:"2026-03", cat:"automation", name:"Tribute Operating System",
+   purpose:"Scheduling Reimagined — the operating-model site and exec positioning for the new SP role and scheduling vision. Built up steadily through Q2.",
+   home:"andrewdobsonn-cell/Tribute-Operating-System · GitHub Pages", status:"live",
+   url:"https://andrewdobsonn-cell.github.io/Tribute-Operating-System/"},
+
+  {date:"2026-04", cat:"dashboard", name:"KSF Project (early build)",
+   purpose:"The first KSF dashboard codebase — the private predecessor to the TributeKSFs hub.",
+   home:"andrewdobsonn-cell/tribute-ksf-project · private repo", status:"local", url:null},
+
+  {date:"2026-04", cat:"dashboard", name:"KSF Scheduling Scoreboard",
+   purpose:"Live Scheduling KSF scoreboard — Revenue, GM%, Filled%, Match — pulled straight from Viv.",
+   home:"~/TributeKSFs · GitHub Pages", status:"live",
+   url:"https://tribute-home-care.github.io/TributeKSFs/scheduling.html"},
+
+  {date:"2026-05", cat:"platform", name:"tribute-api · vivProxy",
+   purpose:"The data backbone. Azure Function proxy into the Viv platform + HubSpot OAuth + public query layer that every dashboard reads from.",
+   home:"~/tribute-api · Azure Functions (prod)", status:"live",
+   url:"https://tribute-api-prod-bkc4hfcwf3f2f6bf.centralus-01.azurewebsites.net/api/vivProxy"},
+
+  {date:"2026-05", cat:"ai", name:"Tribute Call Intelligence",
+   purpose:"The flagship. AI analysis of scheduling calls — coaching, queues, tasks, visit insight. SSO-gated for directors + schedulers.",
+   home:"~/tribute-calls · Azure Container Apps", status:"live",
+   url:"https://tribute-call-intel-app.agreeablefield-f3120a94.centralus.azurecontainerapps.io/"},
+
+  {date:"2026-06", cat:"dashboard", name:"KSF Quality Dashboard",
+   purpose:"Client-facing Quality scorecard — utilization, on-time, visit notes — as a live page on the TributeKSFs site.",
+   home:"~/TributeKSFs · GitHub Pages", status:"live",
+   url:"https://tribute-home-care.github.io/TributeKSFs/quality.html"},
+
+  {date:"2026-06", cat:"dashboard", name:"CSM Hub",
+   purpose:"Courtney's Client Solutions Manager workspace — visit cadence, role expectations, AI assistant, live-synced from Viv + HubSpot.",
+   home:"~/tribute-csm-hub · GitHub Pages", status:"live",
+   url:"https://tribute-home-care.github.io/tribute-csm-hub/"},
+
+  {date:"2026-06", cat:"automation", name:"Availability Qualification & Guide",
+   purpose:"YES / HEDGE availability checker plus the caregiver-facing availability guide. The engine behind smarter staffing answers.",
+   home:"~/tribute-availability-checker · GitHub Pages", status:"live",
+   url:"https://tribute-home-care.github.io/tribute-availability/"},
+
+  {date:"2026-06", cat:"dashboard", name:"KSF Revenue Share",
+   purpose:"Company-share Revenue dashboard with its own gate — a view-only fork of the main revenue page.",
+   home:"~/TributeKSFs/rev · GitHub Pages", status:"live",
+   url:"https://tribute-home-care.github.io/TributeKSFs/rev/"},
+
+  {date:"2026-06", cat:"dashboard", name:"Rise Dashboard",
+   purpose:"Charlotte's MCE Rise dashboard — caregiver lifecycle and manual check-in %, sourced from Viv feeds.",
+   home:"~/tribute-rise-dashboard · GitHub Pages", status:"live",
+   url:"https://tribute-home-care.github.io/tribute-rise-dashboard/"},
+
+  {date:"2026-06", cat:"dashboard", name:"Caregiver Reliability Report",
+   purpose:"Deep-dive scoring model on caregiver unreliability — call-outs, NCNS, partition-by-type analysis.",
+   home:"~/Desktop/Caregiver-Reliability-Report/index.html", status:"local", url:null},
+
+  {date:"2026-06", cat:"dashboard", name:"Revenue Dashboard #2",
+   purpose:"Validates the Monthly Revenue — Live-In report against the original; quantifies the ~17% live-in slice.",
+   home:"~/TributeKSFs · revenue2.html", status:"live",
+   url:"https://tribute-home-care.github.io/TributeKSFs/revenue2.html"},
+
+  {date:"2026-06", cat:"automation", name:"Uber Ride Reconciliation",
+   purpose:"React + Functions app replacing the Excel Uber reconciliation — domain rules, golden numbers, full test suite.",
+   home:"~/tribute-uber-recon · reconciliation.html", status:"live",
+   url:"https://tribute-home-care.github.io/TributeKSFs/reconciliation.html"},
+
+  {date:"2026-06", cat:"dashboard", name:"Availability Audit by State",
+   purpose:"Off-pattern (worked-but-unlisted) audit plus the Availability Task Force briefing across MD / VA / IL.",
+   home:"~/Desktop/Availability-Audit-by-State", status:"local", url:null},
+
+  {date:"2026-06", cat:"automation", name:"Twilio ↔ Teams SMS Bridge",
+   purpose:"A phone-style Messages app inside Teams — same number via Twilio Hosted SMS, contact names + family/POA context from Viv & HubSpot.",
+   home:"~/twilio-teams-bridge · Azure", status:"pending",
+   url:"https://tribute-direct-line-sms.azurewebsites.net"},
+
+  {date:"2026-06", cat:"dashboard", name:"CE / Recruiting Dashboard",
+   purpose:"Applicant-lifecycle hiring funnel — multi-select filters, state benchmarks, KPI trends, prorated hiring goals.",
+   home:"~/TributeKSFs · recruiting.html", status:"live",
+   url:"https://tribute-home-care.github.io/TributeKSFs/recruiting.html"},
+
+  {date:"2026-06", cat:"automation", name:"DocuSign Migration",
+   purpose:"9 Tribute CSA templates migrated Adobe Sign → DocuSign with anchor-based field scripting. Live in prod.",
+   home:"~/adobe-docusign-migration · DocuSign (na4)", status:"live", url:null},
+
+  {date:"2026-06", cat:"automation", name:"Survey Response Workflow",
+   purpose:"NPS auto-notify / escalate — maps survey responses to clients via Viv primary contact. Awaiting M365 Graph creds.",
+   home:"~/TributeKSFs · surveys.html", status:"pending",
+   url:"https://tribute-home-care.github.io/TributeKSFs/surveys.html"},
+
+  {date:"2026-06", cat:"dashboard", name:"KSF Closure Rate",
+   purpose:"Lead → close funnel + partner revenue, joining HubSpot deals to Viv custom queries. Both tabs live.",
+   home:"~/TributeKSFs · closure.html", status:"live",
+   url:"https://tribute-home-care.github.io/TributeKSFs/closure.html"},
+
+  {date:"2026-06", cat:"dashboard", name:"Conversion Rate",
+   purpose:"Sales conversion trends and loss analysis by market, individual lead-taker, and partner tier. Live from HubSpot + Viv.",
+   home:"~/TributeKSFs · cr.html", status:"live",
+   url:"https://tribute-home-care.github.io/TributeKSFs/cr.html"},
+
+  {date:"2026-06", cat:"dashboard", name:"Tier 1 Partners",
+   purpose:"Per-partner deep dive — monthly revenue, active clients, leads, sales, and conversions for each Tier 1 referral partner.",
+   home:"~/TributeKSFs · tier1.html", status:"live",
+   url:"https://tribute-home-care.github.io/TributeKSFs/tier1.html"},
+
+  {date:"2026-06", cat:"automation", name:"Lead Desk",
+   purpose:"Lead-taker one-stop-shop — qualified HubSpot deal queue auto-picks a CSA template, fills the schedule grid, drafts the DocuSign.",
+   home:"~/tribute-availability-checker/docs · prototype", status:"proto",
+   url:"https://tribute-home-care.github.io/tribute-availability/leaddesk-prototype.html"},
+
+  {date:"2026-06", cat:"automation", name:"Lead Taker Tool — Guide",
+   purpose:"Illustrated quick-start for the Lead Taker Tool — what's new since the first look, plus the full 7-step workflow with annotated screenshots.",
+   home:"~/tribute-availability · guide/", status:"proto",
+   url:"https://tribute-home-care.github.io/tribute-availability/guide/"},
+
+  {date:"2026-06", cat:"ai", name:"Sales Call Intelligence",
+   purpose:"The sales sibling to Call Intelligence — replaces Omnition. Branch board + UI prototype, deployed to its own app.",
+   home:"~/tribute-sales-calls · Azure Container Apps", status:"live",
+   url:"https://tribute-sales-intel-app.bravepond-d113e011.centralus.azurecontainerapps.io"},
+
+];
+
+const MONTHS = {
+  "2025-09":"September 2025 · The Origin","2025-10":"October 2025","2026-02":"February 2026",
+  "2026-03":"March 2026","2026-04":"April 2026","2026-05":"May 2026","2026-06":"June 2026"
+};
+const STATUS = {
+  live:{cls:"b-live",txt:"Live"}, local:{cls:"b-local",txt:"Local"},
+  proto:{cls:"b-proto",txt:"Prototype"}, pending:{cls:"b-pending",txt:"Pending"}
+};
+
+const tl = document.getElementById('timeline');
+let lastMonth = null, idx = 0;
+
+PROJECTS.forEach(p => {
+  if (p.date !== lastMonth){
+    lastMonth = p.date;
+    const m = document.createElement('div');
+    m.className = 'month'; m.dataset.month = p.date;
+    m.innerHTML = `<span>${MONTHS[p.date]||p.date}</span>`;
+    tl.appendChild(m);
+  }
+  const side = idx % 2 === 0 ? 'left' : 'right';
+  idx++;
+  const c = CATS[p.cat], st = STATUS[p.status];
+  const row = document.createElement('div');
+  row.className = `row ${side}`; row.dataset.cat = p.cat;
+  const linkHTML = p.url
+    ? `<span class="link">Open live <span class="arrow">→</span></span>`
+    : `<span class="link dead">Lives locally · embed me anywhere</span>`;
+  const tag = p.url ? 'a' : 'div';
+  const href = p.url ? `href="${p.url}" target="_blank" rel="noopener"` : '';
+  row.innerHTML = `
+    <${tag} class="card" ${href} style="--accent:${c.accent}">
+      <div class="top">
+        <h3>${p.name}</h3>
+        <span class="badge ${st.cls}">${st.txt}</span>
+      </div>
+      <span class="cat-tag">${c.label}</span>
+      <p>${p.purpose}</p>
+      <div class="meta"><span>📁 <code>${p.home}</code></span></div>
+      ${linkHTML}
+    </${tag}>`;
+  tl.appendChild(row);
+});
+
+// stats
+document.getElementById('s-total').textContent = PROJECTS.length;
+document.getElementById('s-live').textContent = PROJECTS.filter(p=>p.status==='live').length;
+document.getElementById('s-local').textContent = PROJECTS.filter(p=>p.status==='local').length;
+
+// filtering — single-select: click a type to show only that type, "All" to reset
+const chips = document.querySelectorAll('.chip');
+let current = 'all';
+function render(){
+  document.querySelectorAll('.row').forEach(r=>{
+    r.classList.toggle('hide', current!=='all' && r.dataset.cat!==current);
+  });
+  // hide empty months
+  document.querySelectorAll('.month').forEach(m=>{
+    let n = m.nextElementSibling, visible=false;
+    while(n && !n.classList.contains('month')){
+      if(n.classList.contains('row') && !n.classList.contains('hide')) visible=true;
+      n = n.nextElementSibling;
+    }
+    m.classList.toggle('hide', !visible);
+  });
+  // re-stripe sides for visible rows
+  let i=0;
+  document.querySelectorAll('.row:not(.hide)').forEach(r=>{
+    r.classList.remove('left','right');
+    r.classList.add(i%2===0?'left':'right'); i++;
+  });
+  // highlight the selected chip
+  chips.forEach(c=> c.classList.toggle('sel', c.dataset.cat===current));
+}
+chips.forEach(ch=>{
+  ch.addEventListener('click',()=>{ current = ch.dataset.cat; render(); });
+});
+render();
+</script>
+</body>
+</html>
