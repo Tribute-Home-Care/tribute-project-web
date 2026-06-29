@@ -123,6 +123,71 @@
     .row .card::before{ left:-32px !important; right:auto !important;}
     .month{ text-align:left; padding-left:0;}
   }
+
+  /* ---------- top bar + tabs ---------- */
+  .topbar{ position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between;
+    gap:16px; padding:12px 24px; background:rgba(250,248,245,.88); backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--stone-200);}
+  .brand{ display:flex; align-items:center; gap:9px; font-weight:800; letter-spacing:-.01em; color:var(--stone-900); font-size:15px;}
+  .brand-dot{ width:11px; height:11px; border-radius:50%; background:var(--terra); box-shadow:0 0 0 4px var(--terra-soft);}
+  .tabs{ display:flex; gap:4px; background:var(--stone-100); padding:4px; border-radius:999px; border:1px solid var(--stone-200);}
+  .tab{ border:0; background:transparent; cursor:pointer; font-size:13.5px; font-weight:700; color:var(--stone-500);
+    padding:7px 18px; border-radius:999px; transition:.15s; font-family:inherit;}
+  .tab:hover{ color:var(--stone-700);}
+  .tab.sel{ background:#fff; color:var(--stone-900); box-shadow:0 1px 3px rgba(60,50,35,.14);}
+  [hidden]{ display:none !important;}
+
+  /* ---------- transformation ---------- */
+  .tx-kpis{ max-width:1100px; margin:22px auto 0; padding:0 24px; display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px;}
+  .kpi{ background:#fff; border:1px solid var(--stone-200); border-radius:14px; padding:16px 18px; border-top:3px solid var(--kc,var(--line));}
+  .kpi .klabel{ font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--stone-500); font-weight:700;}
+  .kpi .kval{ font-size:27px; font-weight:800; color:var(--stone-900); margin:6px 0 1px; letter-spacing:-.02em;}
+  .kpi .kgoal{ font-size:12px; color:var(--stone-500);}
+  .kpi .ktag{ display:inline-block; margin-top:8px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; padding:2px 8px; border-radius:6px;}
+  .k-good{ background:#dff0e4; color:#2f7d50;} .k-warn{ background:#f6e0d8; color:#b5654a;}
+
+  .section-h{ max-width:1100px; margin:42px auto 14px; padding:0 24px;}
+  .section-h h2{ font-size:22px; font-weight:800; letter-spacing:-.02em; color:var(--stone-900);}
+  .section-h p{ font-size:13.5px; color:var(--stone-500); margin-top:3px;}
+
+  .vision-grid{ max-width:1100px; margin:0 auto; padding:0 24px; display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:16px;}
+  .vcard{ background:#fff; border:1px solid var(--stone-200); border-radius:16px; padding:20px; border-left:4px solid var(--fc,var(--line));}
+  .vcard .vfunc{ font-size:10.5px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--fc,var(--terra));}
+  .vcard h3{ font-size:17px; font-weight:800; margin:3px 0 1px; color:var(--stone-900);}
+  .vcard .vrole{ font-size:12px; color:var(--stone-500); margin-bottom:11px;}
+  .vcard .vtext{ font-size:13px; color:var(--stone-700); line-height:1.55;}
+  .vcard .vsucc{ margin-top:13px; padding-top:13px; border-top:1px dashed var(--stone-200); font-size:12.5px; color:var(--stone-700); line-height:1.5;}
+  .vcard .vsucc b{ display:block; font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--stone-500); margin-bottom:5px;}
+
+  .fnfilter{ max-width:1100px; margin:16px auto 0; padding:0 24px; display:flex; gap:8px; flex-wrap:wrap;}
+  .fchip{ display:inline-flex; align-items:center; gap:7px; cursor:pointer; user-select:none; border:1px solid var(--stone-200);
+    background:#fff; padding:6px 13px; border-radius:999px; font-size:12.5px; font-weight:700; color:var(--stone-700); transition:.15s;}
+  .fchip .fdot{ width:9px; height:9px; border-radius:50%;}
+  .fchip.sel{ background:var(--stone-900); color:#fff; border-color:var(--stone-900);}
+
+  .init-grid{ max-width:1100px; margin:10px auto 0; padding:0 24px; display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(345px,1fr)); gap:16px;}
+  .icard{ background:#fff; border:1px solid var(--stone-200); border-radius:16px; padding:18px; border-top:3px solid var(--fc,var(--line)); display:flex; flex-direction:column;}
+  .icard .itop{ display:flex; gap:8px; align-items:flex-start; margin-bottom:3px;}
+  .icard .ifunc{ font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--fc,var(--terra));}
+  .icard h4{ font-size:15px; font-weight:750; color:var(--stone-900); line-height:1.25; margin:2px 0 0;}
+  .lc{ font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; padding:2px 7px; border-radius:5px; background:var(--stone-100); color:var(--stone-700); white-space:nowrap;}
+  .lc.central{ background:#e4dff1; color:#6b5ca5;}
+  .icard .igoal{ font-size:12.5px; color:var(--stone-700); margin:9px 0 12px; line-height:1.5;}
+  .kpibar{ background:var(--stone-50); border:1px solid var(--stone-200); border-radius:10px; padding:9px 11px; margin-bottom:12px;}
+  .kpibar .km{ font-size:12px; font-weight:750; color:var(--stone-900);}
+  .kpibar .kbg{ display:flex; justify-content:space-between; gap:10px; margin-top:5px; font-size:11.5px; color:var(--stone-500);}
+  .kpibar .kbg b{ color:var(--stone-900); font-weight:700;}
+  .qrow{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:auto;}
+  .q{ background:var(--stone-50); border:1px solid var(--stone-200); border-radius:8px; padding:7px 8px;}
+  .q .ql{ font-size:8.5px; font-weight:800; letter-spacing:.03em; color:var(--fc,var(--stone-500)); text-transform:uppercase;}
+  .q .qt{ font-size:10px; color:var(--stone-700); line-height:1.35; margin-top:3px;}
+  .paused{ font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:#b5654a; background:#f6e0d8; padding:2px 7px; border-radius:5px; white-space:nowrap;}
+  .tx-refresh{ display:inline-flex; align-items:center; gap:7px; cursor:pointer; border:1px solid var(--stone-300);
+    background:#fff; border-radius:10px; padding:8px 14px; font-size:12.5px; font-weight:700; color:var(--stone-700); font-family:inherit; transition:.15s;}
+  .tx-refresh:hover{ border-color:var(--terra); color:var(--terra);}
 </style>
 </head>
 <body>
@@ -155,6 +220,16 @@
   });
 })();
 </script>
+
+<div class="topbar">
+  <div class="brand"><span class="brand-dot"></span> Tribute Home Care</div>
+  <nav class="tabs" id="tabs">
+    <button class="tab sel" data-view="build">The Build</button>
+    <button class="tab" data-view="transformation">Transformation</button>
+  </nav>
+</div>
+
+<div id="view-build">
 <header>
   <div class="eyebrow">Andrew Dobson · Tribute Home Care</div>
   <h1>The Build.<br><span>Everything, on a timeline.</span></h1>
@@ -181,6 +256,29 @@
 <footer>
   Generated 2026-06-29 · Hover a node to lift it, click to open its live home. Edit the <code style="font-family:monospace">PROJECTS</code> array in this file to add the next thing you build.
 </footer>
+</div><!-- /view-build -->
+
+<div id="view-transformation" hidden>
+  <header>
+    <div class="eyebrow">Tribute Home Care · Transformation Plan</div>
+    <h1>Vision, Roadmap &amp; <span>KPIs</span>.</h1>
+    <p class="sub">Leader vision, the quarterly roadmap, and live KPIs across every function — Q3 2026 → Q2 2027.</p>
+    <div style="display:flex;gap:12px;align-items:center;margin-top:18px;flex-wrap:wrap;">
+      <button class="tx-refresh" id="txRefresh">⟳ Update from workbook</button>
+      <span id="txAsOf" style="font-size:12px;color:var(--stone-500);">9 leaders · 33 initiatives</span>
+      <input type="file" id="txFile" accept=".xlsx" hidden>
+    </div>
+  </header>
+  <div class="tx-kpis" id="txKpis"></div>
+  <div class="section-h"><h2>Leader Vision</h2><p>Where each function is headed by Q2 2027.</p></div>
+  <div class="vision-grid" id="txVisions"></div>
+  <div class="section-h"><h2>Initiatives &amp; Roadmap</h2><p>Every initiative with its KPI and quarterly milestones. Filter by function.</p></div>
+  <div class="fnfilter" id="txFilter"></div>
+  <div class="init-grid" id="txInits"></div>
+  <footer>
+    Rendered from <code style="font-family:monospace">TributeTransformation_final.xlsx</code> · to refresh, drop the updated workbook into the repo (or hand it to Claude) and the page re-renders.
+  </footer>
+</div><!-- /view-transformation -->
 
 <script>
 const CATS = {
@@ -407,6 +505,197 @@ chips.forEach(ch=>{
   ch.addEventListener('click',()=>{ current = ch.dataset.cat; render(); });
 });
 render();
+</script>
+
+<!-- ============ TRANSFORMATION TAB ============ -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+const FN = {
+  sales:   {name:"Sales",       leader:"Colin Fields",      color:"#b5654a"},
+  mkt:     {name:"Marketing",   leader:"Brian Cavoli",      color:"#c08a3e"},
+  ops:     {name:"Market Ops",  leader:"Jen Kulig",         color:"#3f7d6e"},
+  sched:   {name:"Scheduling",  leader:"Andrew Dobson",     color:"#3b6ea5"},
+  cta:     {name:"CTA",         leader:"Jeanine Desatnick", color:"#6b5ca5"},
+  ce:      {name:"Caregiver Excellence", leader:"Charlotte Brown", color:"#a64d6f"},
+  pc:      {name:"People & Culture",     leader:"Regina McNally",  color:"#7a8c3f"},
+  sppm:    {name:"Strategy & PM", leader:"Galip Gencer",    color:"#4a5d8a"},
+  fin:     {name:"Finance",     leader:"Audra Rogles",      color:"#2f7d50"},
+};
+
+const VISIONS = [
+  {fn:"sales", vision:"Build and scale a formal commercial infrastructure that grows Tribute to $50M revenue and $7M net income — by systematizing referral-partner engagement, sales conversion, pricing, and client referrals, turning a productive network into a managed, measurable growth engine.",
+   succ:"Four declining Tier 1 accounts stabilized; Tier 1 revenue tracking toward $16M. LH closure 60%→70% through a coaching system Colin owns. Colin's role evolves from player-coach to architect — sales is driven by what the system produces, not who Colin knows."},
+  {fn:"mkt", vision:"Marketing operates as the commercial intelligence and growth engine. AI is the operating system — standing agents across content, analytics, campaigns, CRM, and partner intelligence. Frictionless experience, content at speed, personalization as baseline, continuous optimization — with the human edge on presence, trust, and judgment.", succ:""},
+  {fn:"ops", vision:"Evolve from operational leader of one market into a company-wide Market Operations architect — building a Client Solutions function that reflects what families actually value, elevating lead taking, and aligning all departments and markets to operate in unison on the path to $50M.",
+   succ:"MA led by a market-level leader with full autonomy; Jen stepped back. Client Solutions redesigned around what families want, letting CSMs carry meaningfully more clients. Lead taking converts more long-hour clients. All four core departments aligned and consistent across three markets."},
+  {fn:"sched", vision:"Transform Scheduling from a manual, phone-driven operation into an AI-supported function — where a scheduling agent handles routine coverage, caregiver intelligence guides every match, and Scheduling Partners step up from dispatchers into expert care-team builders, edge-case owners, and capacity analysts.",
+   succ:"Routine coverage runs itself. Every match is informed by caregiver intelligence built from recorded calls. The SP role is elevated to the higher-value work only people can do. The team scales without growing — technology is the enabler, not the headline."},
+  {fn:"cta", vision:"Find, attract, and keep the remarkable caregivers behind Tribute's growth to $50M through a predictive, data-driven talent engine that identifies reliable caregivers before they're hired, matches them to the right hours and market, and guides them through a frictionless onboarding experience.",
+   succ:"The Reliability Index flags high-risk candidates before offer. The Caregiver Mirror directs sourcing toward profiles that stay. 'Your Way In' removes every friction point from application to first shift. LH Unable-to-Fill drops from 33 to 16."},
+  {fn:"ce", vision:"Become the best employer in home care by building a custom AI platform that eliminates the manual operational burden on MCEs — freeing Caregiver Excellence to direct capacity toward higher pay, individualized training, and the human relationships that drive retention.",
+   succ:"Caregiver wages increase — Tribute is the most competitive payer in our markets. Every caregiver has a personalized annual training plan. MCEs manage larger teams with a data-backed ceiling. Retention improves, attracting higher-quality applicants."},
+  {fn:"pc", vision:"Build the people foundation for Tribute's next chapter — developing talent from within, staying ahead of how AI changes work, and designing rewards that retain our best talent.",
+   succ:"P&C is recognized as a strategic driver of Tribute's future. Internal mobility is the norm. AI's impact on work is actively managed. Total rewards are competitive and tied to outcomes — making Tribute the employer of choice in every market."},
+  {fn:"sppm", vision:"Build the operating model, intelligence infrastructure, and change-management capability to reach $50M revenue with NOI approaching 15% — eliminating every process that doesn't add value to clients and caregivers, and giving leadership full real-time visibility.",
+   succ:"All 9 departments complete their transformation. Change management and sustainability are embedded — KPIs hold, no reversion. Every key KSF is automated and visible in real time. The CEO operates with daily strategic intelligence — faster, better-framed, forward-looking decisions."},
+  {fn:"fin", vision:"Bring data-driven profit-maximization recommendations to leadership to support $50M revenue with 11–13% net income in 3 years — with executed strategic banking partnership, cash-flow planning, and an AI-automated close process.",
+   succ:"9% NI margin ($40M revenue). Strategic banker partnership live. All possible close activities automated/AI-assisted. A 3-FTE team with expanded scope."},
+];
+
+const KPIS = [
+  {label:"Revenue · 12-mo run rate", val:"$34.2M", goal:"Budget $32.3M", good:true,  color:"#3f7d6e"},
+  {label:"Gross Margin %",           val:"32.9%",  goal:"Goal 32.8%",    good:true,  color:"#b5654a"},
+  {label:"Contribution Margin %",    val:"19.0%",  goal:"Goal 20.0%",    good:false, color:"#c08a3e"},
+  {label:"Net Income %",             val:"7.6%",   goal:"Goal 6.2%",     good:true,  color:"#2f7d50"},
+];
+
+// fn, name, goal(one-line), lc, kpi, base, goal, cur, q3,q4,q1,q2, paused
+const INITS = [
+  {fn:"sales",n:"Human-Centered Selling",lc:"Local",kpi:"RDM Revenue Growth",base:"Above breakeven",goal:"~18%/yr per RDM",g:"Build a coaching-driven sales system so every RDM grows revenue ~18% annually through structured account development.",q3:"MA RDM ramp; account transfers; MD+IL visit cadence; POV framework",q4:"Monthly coaching all 3 markets",q1:"Revenue growing YoY",q2:"≥1 preferred partnership; annual coaching review"},
+  {fn:"sales",n:"Outcome-Driven Account Planning",lc:"Local",kpi:"Tier 1 Revenue Run Rate",base:"$13.8M (4 declining)",goal:"$16M annualized",cur:"$13.5M",g:"Recover four declining Tier 1 accounts and grow Tier 1 revenue to a $16M annualized run rate.",q3:"11 Tier 1 plans active; 4 recovery plans w/ owners",q4:"80% recovery; 1 Tier 2 elevation",q1:"Recovered to 2025; Tier 2 per market",q2:"$16M run rate; 3 embedded partnerships"},
+  {fn:"sales",n:"Lead Taking System",lc:"Central",kpi:"LH Lead Closure Rate",base:"TBD",goal:"+10 pts",g:"Improve live-in lead closure +10 points through structured 1:1 coaching and AI-assisted call analysis.",q3:"Colin/Brian/Jen alignment; 1:1 coaching; first AI call report",q4:"Coaching cycles complete; Q4 group training",q1:"Structure operational; revised curriculum",q2:""},
+  {fn:"sales",n:"DOS-Led Growth Architecture",lc:"Local",kpi:"Strategic Community Penetration",base:"1 primary (Boylston Place)",goal:"Primary in 2 LCB + BV Grosvenor",g:"Establish Tribute as primary provider in two senior-living communities and expand into Bethesda.",q3:"Quality dashboard; Bethesda strategy; 2nd LCB target",q4:"LCB 2nd + BV Grosvenor active",q1:"Primary at LCB 2nd",q2:"LCB exec presentation; Bethesda expansion; playbook v1"},
+
+  {fn:"mkt",n:"Lead Conversion System",lc:"Central",kpi:"Adjusted LH Closure Rate",base:"60%",goal:"70%",cur:"62%",g:"Lift adjusted LH closure 60%→70% by automating call workflows and deploying AI coaching, scoring, and scheduling tools.",q3:"Call→CSA automated; per-taker coaching reports",q4:"63%; real-time availability data",q1:"66%; real-time call advisor + Breeze scoring",q2:"70%; CSA + welcome kit by client profile"},
+  {fn:"mkt",n:"Partner Growth System",lc:"Central",kpi:"Tier 1 Revenue Growth",base:"Not tracked",goal:"+20% total / +15% avg",g:"Grow Tier 1 partner revenue +20% through AI dashboards, performance alerts, and deeper account management.",q3:"H2 Tier 1 assessment + EC review; dashboards online",q4:"At-risk accounts addressed",q1:"+5% YoY",q2:"+15% YoY; partner agent"},
+  {fn:"mkt",n:"Client Engagement System",lc:"Local",kpi:"Returning Clients",base:"30",goal:"50",cur:"97 (12-mo)",g:"Grow returning clients 30→50 via AI-segmented end-of-care outreach and personalized reengagement.",q3:"EOC outreach (manual test); segmentation dashboard",q4:"",q1:"Care-specific personalization + automation",q2:""},
+  {fn:"mkt",n:"Pricing Optimization System",lc:"Local",kpi:"Budget & Competitive Position",base:"Current pricing",goal:"Budget met; competitive",g:"Maintain budget and competitive positioning via automated rate tracking, a migration agent, and a competitor dashboard.",q3:"Fall Call Sprint; rate decisions; rate-tracker dashboard",q4:"Migration agent; 2027 pricing model; competitor dashboard",q1:"Competitive calling resource",q2:"Spring Call Sprint; rate decisions"},
+
+  {fn:"ops",n:"MA Transition & Market Structure",lc:"Local",kpi:"Time on MA Operations",base:"6–7% net profit",goal:"10% net profit 2027",g:"Transition Jen out of day-to-day MA ops into a company-wide Market Operations architect role.",q3:"Assess market-director layer; identify leader; transition plan",q4:"New MA leader transition begins",q1:"CSM dept head identified; Jen → architect",q2:""},
+  {fn:"ops",n:"Client Solutions Value Assessment",lc:"Central",kpi:"Avg CSM Caseload",base:"~30 clients",goal:"35+ per CSM",cur:"26.4",g:"Redesign CSM into a choice-based tiered model so each CSM can carry 35+ clients without reducing quality.",q3:"Listening sessions; map model; gap analysis",q4:"Choice-based tiers designed; pilot cohort",q1:"Model launched w/ pilot; v2 ready",q2:""},
+  {fn:"ops",n:"Lead Taking Elevation",lc:"Central",kpi:"LH Adjusted Closure",base:"0.6",goal:"0.7 (+10%)",g:"Improve LH closure +10% via a lead-taking audit, real-time availability data, and a coaching cadence.",q3:"Audit; coaching framework w/ Colin",q4:"Real-time availability piloted in 1 market",q1:"Live in all markets",q2:""},
+
+  {fn:"sched",n:"Scheduling Agent",lc:"Central",kpi:"% Open Visits Filled by Agent",base:"<10% est.",goal:">70% auto-fill",cur:"8.5% (SB pilot)",g:"Deploy an AI scheduling agent that auto-fills 70%+ of routine open visits, freeing SPs from manual phone work.",q3:"Open-availability source of truth; agent recommends; pilot 1 market",q4:"Auto-fill routine; call-out recovery; Secure audit automated",q1:"End-to-end ~40%; reschedules automated",q2:""},
+  {fn:"sched",n:"Caregiver Intelligence",lc:"Central",kpi:"% Calls Transcribed + Analyzed",base:"~60%",goal:"99%",g:"Reach 99% caregiver-call transcription so communication signals drive matching, coaching, and retention.",q3:"90%+ capture; signals on profiles; ops dashboard",q4:"Coaching reports + red-flag alerts",q1:"Profiles drive matching at fill time",q2:""},
+  {fn:"sched",n:"SP Role Transformation",lc:"Central",kpi:"Active Clients per SP",base:"48",goal:"65",cur:"56",g:"Redefine SP roles from dispatchers to care-team builders so each SP manages 65 clients, up from 48.",q3:"New SP roles defined + approved; workload baselined",q4:"Pilot 1 market; ~25% fills without SP",q1:"Live all 3 markets; manual hours −30%",q2:""},
+
+  {fn:"cta",n:"Minimize LH Unable-to-Fill",lc:"Central",kpi:"12-Mo Rolling UTF",base:"33",goal:"16",g:"Cut the live-in Unable-to-Fill rate from 33 to 16 through reliability, sourcing, and onboarding gains.",q3:"",q4:"",q1:"",q2:""},
+  {fn:"cta",n:"Reliability Index",lc:"Central",kpi:"90-Day Turnover",base:"25–30%",goal:"<25%",g:"Build a predictive candidate risk-scoring model that flags low-reliability applicants before offer.",q3:"Audit hire/exit data; reliability framework",q4:"Predictive risk model v1; ATS live",q1:"Pilot scoring live in workflow",q2:""},
+  {fn:"cta",n:"The Caregiver Mirror",lc:"Central",kpi:"% Applicants from Mirror Sources",base:"TBD",goal:"+10%",g:"Identify the profile of highest-tenure caregivers and shift sourcing to channels that produce them.",q3:"Top-tenure profiles; map shared traits",q4:"Mirror profile active in ATS",q1:"Stack-ranking active in screening",q2:""},
+  {fn:"cta",n:"Choose Your Adventure (Your Way In)",lc:"Central",kpi:"Net Active Caregiver Headcount",base:"445",goal:"500",g:"Remove every friction point from application to first shift, growing active caregiver headcount to 500.",q3:"Candidate path options; friction audit",q4:"Self-scheduling + auto-reminders live",q1:"Live in all 3 markets",q2:""},
+  {fn:"cta",n:"Experience-First Onboarding + Pipeline",lc:"Central",kpi:"Ability to Hire to Forecast",base:"Not able",goal:"Hire to forecast",g:"Automate onboarding admin in the new ATS and build a warm-bench cadence to hire proactively to forecast.",q3:"Audit onboarding workflow; reimagined vision",q4:"Automate paperwork in ATS; warm-bench cadence",q1:"Warm-bench outreach live",q2:""},
+
+  {fn:"ce",n:"Build the AI Performance Platform",lc:"Central",kpi:"MCE Admin Time Reduction",base:"Q3 baseline",goal:"30–40% reduction",g:"Deploy a custom AI platform that cuts MCE admin time 30–40% and surfaces caregiver performance signals.",q3:"Requirements; architecture + integrations",q4:"Call recording live; auto-flag; Rise automation",q1:"Fully deployed; >80% daily use",q2:"",note:"Engineering owns Q4–Q1 (mat leave)"},
+  {fn:"ce",n:"Maximize MCE Effectiveness & Capacity",lc:"Central",kpi:"Market Team-Size Targets",base:"No standard",goal:"Targets set + approved",g:"Use platform data to define market-specific MCE team-size targets and a live capacity framework.",q3:"Cross-market baseline; MD hypothesis",q4:"Time-data capture underway",q1:"Capacity model complete",q2:"",note:"Mat leave Q4–Q1"},
+  {fn:"ce",n:"Launch Annual Training Program",lc:"Central",kpi:"% Caregivers w/ Training Plan",base:"0%",goal:"Curriculum framework",g:"Design and fund a formal annual caregiver training program with an approved curriculum framework.",q3:"Budget estimated + submitted",q4:"PAUSED",q1:"PAUSED",q2:"",paused:true},
+  {fn:"ce",n:"Offer the Most Attractive Wage Possible",lc:"Local",kpi:"Avg Wage vs Top Competitor",base:"TBD",goal:"#1 payer each market",g:"Become the #1 payer in each market via competitor wage analysis, budget approval, and implemented raises.",q3:"Competitor wage map; gap analysis; proposal",q4:"Wage budget approved",q1:"Raises announced + implemented",q2:"",note:"Mat leave Q4–Q1"},
+
+  {fn:"pc",n:"Internal Talent Development",lc:"Local",kpi:"Internal Fill / Mobility Rate",base:"TBD",goal:"30%+ internal",g:"Build a structured internal mobility and 'grow your own' pathway so 30%+ of roles fill from within.",q3:"360 pilot (Jen+Brian); JDs; pathway framework",q4:"Mobility pilot 2–3 markets; JDs complete",q1:"First 'grow your own' cohort; 360 v2",q2:""},
+  {fn:"pc",n:"Future-Ready P&C Operations",lc:"Local",kpi:"OA Tech Engagement Score",base:"Pain point (2025)",goal:"Measurable improvement",g:"Modernize P&C with a new HCM/ATS and AI workflows to improve OA technology engagement scores.",q3:"HCM/ATS decision; AI in 1+ workflow",q4:"HCM execution; AI in 3+; playbook",q1:"HCM full motion; AI impact tracker live",q2:""},
+  {fn:"pc",n:"Total Rewards & OA Engagement",lc:"Local",kpi:"OA Engagement (B&W + C&R)",base:"B&W 4.18 / C&R 4.30",goal:"Both trending up",g:"Improve OA Benefits/Wellness and Communication/Recognition through a data-driven rewards strategy.",q3:"Chicago incentive pilot; rewards audit; comp research",q4:"Strategy framework drafted",q1:"Approved by EC; touchpoint pilot",q2:""},
+  {fn:"pc",n:"Change Readiness",lc:"Local",kpi:"Change Readiness Score",base:"TBD",goal:"Reported to EC",g:"Establish a quarterly Change Readiness pulse and Role Evolution Readiness framework across departments.",q3:"Pulse designed + launched; baseline; cross-training map",q4:"Q4 pulse trending up",q1:"Role Evolution framework forming",q2:""},
+
+  {fn:"sppm",n:"Lead & Complete Transformation (9 Depts)",lc:"Local",kpi:"Net Income %",base:"6.7% (Jun'26)",goal:"8.7% Jun'27 / 9.5% Dec'27",cur:"7.6%",g:"Drive all nine departments through operating-model transformation to lift NI% from 6.7% to 8.7%.",q3:"Exec alignment; Scheduling launched as POC",q4:"Scheduling results; 2027 budget approved",q1:"Market operating-model options designed",q2:""},
+  {fn:"sppm",n:"Sustainability & Change Management",lc:"Local",kpi:"Initiative On-Track Rate",base:"N/A",goal:"80%+",g:"Launch PM governance and a steering committee to keep 80%+ of initiatives on track and embed change.",q3:"Governance + steering committee; log all initiatives",q4:"First steering review; reskilling plan",q1:"Impact report; governance v2",q2:""},
+  {fn:"sppm",n:"Automate the KSFs",lc:"Local",kpi:"KSF Dashboards in Weekly Use",base:"2 of 9",goal:"100%",cur:"28%",g:"Build live KSF dashboards for all nine departments plus a CEO-level company dashboard.",q3:"All KSF dashboards live; baselines signed off",q4:"CEO company dashboard live",q1:"Proactive reporting cadence live",q2:""},
+  {fn:"sppm",n:"Strategic & Financial Intelligence",lc:"Central",kpi:"CEO Proactive Intelligence",base:"Ad hoc",goal:"Forecasts + warning systems",g:"Give the CEO proactive financial and risk intelligence via early-warning systems and rolling forecasts.",q3:"5-yr P&L model; early-warning indicators",q4:"Warning system; briefing format",q1:"Cadence live; rolling forecast v1",q2:""},
+
+  {fn:"fin",n:"Profit Maximization",lc:"Local",kpi:"Rolling Forecast & NI%",base:"No rolling forecast",goal:"2028 budget on rolling baseline",g:"Implement a rolling forecast connected to operational dashboards to reach a 9% NI margin.",q3:"Build 2027 Budget v1",q4:"Final budget by 11/20/26",q1:"Rolling forecast; test vs Q1 actuals",q2:""},
+  {fn:"fin",n:"Cash Flow Planning & Strategic Cash",lc:"Local",kpi:"Banking Partner + Cash Forecast",base:"ACH limits",goal:"Quarterly cash review live",g:"Select a strategic banking partner and build a rolling cash-forecast model for data-driven deployment.",q3:"Evaluate + select banking partner",q4:"Rolling cash model; min-cash requirements",q1:"Optimize deployment; ROI framework",q2:""},
+  {fn:"fin",n:"Accelerate Financial Close",lc:"Central",kpi:"Monthly Close (Business Days)",base:"5 days",goal:"3 days",g:"Reduce the monthly close from 5 to 3 days by automating statements, reconciliations, and variance analysis.",q3:"Automate statements (QBO + Claude)",q4:"Automate key reconciliations",q1:"AI variance analysis; close dashboard",q2:""},
+];
+
+// ---- render ----
+function txRenderKpis(){
+  document.getElementById('txKpis').innerHTML = KPIS.map(k=>`
+    <div class="kpi" style="--kc:${k.color}">
+      <div class="klabel">${k.label}</div>
+      <div class="kval">${k.val}</div>
+      <div class="kgoal">${k.goal}</div>
+      <span class="ktag ${k.good?'k-good':'k-warn'}">${k.good?'On / above goal':'Below goal'}</span>
+    </div>`).join('');
+}
+function txRenderVisions(){
+  document.getElementById('txVisions').innerHTML = VISIONS.map(v=>{
+    const f=FN[v.fn];
+    return `<div class="vcard" style="--fc:${f.color}">
+      <div class="vfunc">${f.name}</div>
+      <h3>${f.leader}</h3>
+      <div class="vrole">${f.name} Leader</div>
+      <div class="vtext">${v.vision}</div>
+      ${v.succ?`<div class="vsucc"><b>Success by Q2 2027</b>${v.succ}</div>`:''}
+    </div>`;
+  }).join('');
+}
+let txFilter='all';
+function txRenderFilter(){
+  const keys=Object.keys(FN);
+  document.getElementById('txFilter').innerHTML =
+    `<span class="fchip ${txFilter==='all'?'sel':''}" data-fn="all">All functions</span>` +
+    keys.map(k=>`<span class="fchip ${txFilter===k?'sel':''}" data-fn="${k}"><span class="fdot" style="background:${FN[k].color}"></span>${FN[k].name}</span>`).join('');
+  document.querySelectorAll('#txFilter .fchip').forEach(c=>c.addEventListener('click',()=>{ txFilter=c.dataset.fn; txRenderFilter(); txRenderInits(); }));
+}
+function q(label,txt,color){
+  return `<div class="q"><div class="ql" style="--fc:${color}">${label}</div><div class="qt" style="${txt?'':'opacity:.4'}">${txt||'—'}</div></div>`;
+}
+function txRenderInits(){
+  const list = INITS.filter(i=>txFilter==='all'||i.fn===txFilter);
+  document.getElementById('txInits').innerHTML = list.map(i=>{
+    const f=FN[i.fn];
+    return `<div class="icard" style="--fc:${f.color}">
+      <div class="itop">
+        <div style="flex:1">
+          <div class="ifunc">${f.name} · ${f.leader}</div>
+          <h4>${i.n}</h4>
+        </div>
+        ${i.paused?'<span class="paused">⏸ Paused</span>':`<span class="lc ${i.lc==='Central'?'central':''}">${i.lc}</span>`}
+      </div>
+      <div class="igoal">${i.g}</div>
+      <div class="kpibar">
+        <div class="km">${i.kpi}</div>
+        <div class="kbg"><span>Baseline <b>${i.base}</b></span>${i.cur?`<span>Now <b>${i.cur}</b></span>`:''}<span>Goal <b>${i.goal}</b></span></div>
+      </div>
+      <div class="qrow">
+        ${q('Q3 26',i.q3,f.color)}${q('Q4 26',i.q4,f.color)}${q('Q1 27',i.q1,f.color)}${q('Q2 27',i.q2,f.color)}
+      </div>
+      ${i.note?`<div style="margin-top:9px;font-size:10.5px;color:#b5654a;font-weight:700">⚠ ${i.note}</div>`:''}
+    </div>`;
+  }).join('');
+}
+function txRenderAll(){ txRenderKpis(); txRenderVisions(); txRenderFilter(); txRenderInits(); }
+txRenderAll();
+
+// ---- tab switching ----
+document.querySelectorAll('#tabs .tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('#tabs .tab').forEach(x=>x.classList.toggle('sel',x===t));
+    const v=t.dataset.view;
+    document.getElementById('view-build').hidden = v!=='build';
+    document.getElementById('view-transformation').hidden = v!=='transformation';
+    window.scrollTo({top:0});
+  });
+});
+
+// ---- interim refresh: parse a locally chosen workbook (Microsoft-login live pull to be layered on) ----
+const txFileEl=document.getElementById('txFile');
+document.getElementById('txRefresh').addEventListener('click',()=>txFileEl.click());
+txFileEl.addEventListener('change',e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const asOf=document.getElementById('txAsOf');
+  asOf.textContent='Reading workbook…';
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const wb=XLSX.read(new Uint8Array(ev.target.result),{type:'array'});
+      const sheet=wb.SheetNames.find(n=>/kpi/i.test(n))||wb.SheetNames[wb.SheetNames.length-1];
+      const rows=XLSX.utils.sheet_to_json(wb.Sheets[sheet],{header:1,blankrows:false});
+      const num=s=>{const m=String(s).replace(/[^0-9.\-]/g,'');return m?parseFloat(m):null;};
+      const lastNum=row=>{for(let j=row.length-1;j>=0;j--){const n=num(row[j]); if(n!==null&&!isNaN(n))return n;}return null;};
+      let hits=0;
+      rows.forEach(row=>{
+        const label=String(row[0]||row[1]||'').toLowerCase();
+        const set=(i,fmt)=>{const v=lastNum(row); if(v!=null){KPIS[i].val=fmt(v); hits++;}};
+        if(/net income/.test(label)) set(3,v=>(v<1?(v*100):v).toFixed(1)+'%');
+        else if(/gross margin/.test(label)) set(1,v=>(v<1?(v*100):v).toFixed(1)+'%');
+        else if(/contribution margin/.test(label)) set(2,v=>(v<1?(v*100):v).toFixed(1)+'%');
+        else if(/revenue/.test(label)) set(0,v=>'$'+(v/1e6).toFixed(1)+'M');
+      });
+      txRenderKpis();
+      asOf.textContent = hits? `Updated from ${file.name} · ${new Date().toLocaleDateString()}` : `Couldn't auto-map KPIs in ${file.name} — sheet "${sheet}"`;
+    }catch(err){ asOf.textContent='Could not read that file: '+err.message; }
+  };
+  r.readAsArrayBuffer(file);
+});
 </script>
 </body>
 </html>
