@@ -509,6 +509,7 @@ render();
 
 <!-- ============ TRANSFORMATION TAB ============ -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.28.1/lib/msal-browser.min.js"></script>
 <script>
 const FN = {
   sales:   {name:"Sales",       leader:"Colin Fields",      color:"#b5654a"},
@@ -666,36 +667,76 @@ document.querySelectorAll('#tabs .tab').forEach(t=>{
   });
 });
 
-// ---- interim refresh: parse a locally chosen workbook (Microsoft-login live pull to be layered on) ----
+// ---- live refresh: Microsoft sign-in → Graph pull from SharePoint, with local-file fallback ----
+const TX_CFG = {
+  clientId:"b1a3919b-e7a1-406d-80d7-7e68fd8f82aa",
+  tenantId:"3277c56b-67a5-4dbc-9f82-474b19e15eb3",
+  driveId:"b!qXCNqBcvQ0q0QRztrI9qiBrl8ydcrU5HiPGKu1JcV3MjNt8BpMhZQpGv19bL0j7U",
+  itemId:"01YP235Z5AUPARUOB4AFHJNJUEIB7VRQX4",
+  scopes:["Files.Read.All","Sites.Read.All"]
+};
+const asOf=document.getElementById('txAsOf');
 const txFileEl=document.getElementById('txFile');
-document.getElementById('txRefresh').addEventListener('click',()=>txFileEl.click());
-txFileEl.addEventListener('change',e=>{
-  const file=e.target.files[0]; if(!file) return;
-  const asOf=document.getElementById('txAsOf');
-  asOf.textContent='Reading workbook…';
-  const r=new FileReader();
-  r.onload=ev=>{
-    try{
-      const wb=XLSX.read(new Uint8Array(ev.target.result),{type:'array'});
-      const sheet=wb.SheetNames.find(n=>/kpi/i.test(n))||wb.SheetNames[wb.SheetNames.length-1];
-      const rows=XLSX.utils.sheet_to_json(wb.Sheets[sheet],{header:1,blankrows:false});
-      const num=s=>{const m=String(s).replace(/[^0-9.\-]/g,'');return m?parseFloat(m):null;};
-      const lastNum=row=>{for(let j=row.length-1;j>=0;j--){const n=num(row[j]); if(n!==null&&!isNaN(n))return n;}return null;};
-      let hits=0;
-      rows.forEach(row=>{
-        const label=String(row[0]||row[1]||'').toLowerCase();
-        const set=(i,fmt)=>{const v=lastNum(row); if(v!=null){KPIS[i].val=fmt(v); hits++;}};
-        if(/net income/.test(label)) set(3,v=>(v<1?(v*100):v).toFixed(1)+'%');
-        else if(/gross margin/.test(label)) set(1,v=>(v<1?(v*100):v).toFixed(1)+'%');
-        else if(/contribution margin/.test(label)) set(2,v=>(v<1?(v*100):v).toFixed(1)+'%');
-        else if(/revenue/.test(label)) set(0,v=>'$'+(v/1e6).toFixed(1)+'M');
-      });
-      txRenderKpis();
-      asOf.textContent = hits? `Updated from ${file.name} · ${new Date().toLocaleDateString()}` : `Couldn't auto-map KPIs in ${file.name} — sheet "${sheet}"`;
-    }catch(err){ asOf.textContent='Could not read that file: '+err.message; }
-  };
-  r.readAsArrayBuffer(file);
-});
+let _msal=null;
+async function msalApp(){
+  if(_msal) return _msal;
+  _msal=new msal.PublicClientApplication({
+    auth:{clientId:TX_CFG.clientId, authority:"https://login.microsoftonline.com/"+TX_CFG.tenantId, redirectUri:"https://tribute-home-care.github.io/tribute-project-web/"},
+    cache:{cacheLocation:"sessionStorage"}
+  });
+  await _msal.initialize();
+  return _msal;
+}
+async function graphToken(){
+  const app=await msalApp();
+  let acct=app.getAllAccounts()[0];
+  if(!acct){ const r=await app.loginPopup({scopes:TX_CFG.scopes}); acct=r.account; }
+  try{ return (await app.acquireTokenSilent({scopes:TX_CFG.scopes,account:acct})).accessToken; }
+  catch(e){ return (await app.acquireTokenPopup({scopes:TX_CFG.scopes})).accessToken; }
+}
+function parseWorkbook(buf,srcName){
+  const wb=XLSX.read(new Uint8Array(buf),{type:'array'});
+  const sheet=wb.SheetNames.find(n=>/kpi/i.test(n))||wb.SheetNames[wb.SheetNames.length-1];
+  const rows=XLSX.utils.sheet_to_json(wb.Sheets[sheet],{header:1,blankrows:false});
+  const num=s=>{const m=String(s).replace(/[^0-9.\-]/g,'');return m&&!isNaN(parseFloat(m))?parseFloat(m):null;};
+  const lastNum=row=>{for(let j=row.length-1;j>=0;j--){const n=num(row[j]); if(n!=null)return n;}return null;};
+  let hits=0;
+  // company financial KPI cards
+  rows.forEach(row=>{
+    const label=row.map(c=>String(c||'')).join(' ').toLowerCase();
+    const v=lastNum(row); if(v==null) return;
+    const setK=(i,f)=>{KPIS[i].val=f(v); hits++;};
+    if(/net income/.test(label)) setK(3,x=>(x<1?x*100:x).toFixed(1)+'%');
+    else if(/gross margin/.test(label)) setK(1,x=>(x<1?x*100:x).toFixed(1)+'%');
+    else if(/contribution margin/.test(label)) setK(2,x=>(x<1?x*100:x).toFixed(1)+'%');
+    else if(/revenue/.test(label)&&v>1000) setK(0,x=>'$'+(x/1e6).toFixed(1)+'M');
+  });
+  // per-initiative "current" actuals, matched by KPI metric name
+  INITS.forEach(it=>{
+    const key=it.kpi.toLowerCase().replace(/[^a-z0-9 ]/g,'').slice(0,18);
+    const hit=rows.find(r=>r.map(c=>String(c||'')).join(' ').toLowerCase().includes(key));
+    if(hit){ const v=lastNum(hit); if(v!=null){ it.cur=(/%|rate|margin/i.test(it.kpi)&&v<1?(v*100).toFixed(1)+'%':String(v)); } }
+  });
+  txRenderKpis(); txRenderInits();
+  asOf.textContent=(hits?`Live — refreshed from ${srcName}`:`Loaded ${srcName} (KPIs not auto-mapped)`)+` · ${new Date().toLocaleString()}`;
+  return hits;
+}
+async function refreshLive(){
+  if(typeof msal==='undefined'){ asOf.textContent='Sign-in library blocked — loading a local file instead.'; txFileEl.click(); return; }
+  try{
+    asOf.textContent='Signing in with your Tribute account…';
+    const token=await graphToken();
+    asOf.textContent='Fetching the live workbook from SharePoint…';
+    const r=await fetch(`https://graph.microsoft.com/v1.0/drives/${TX_CFG.driveId}/items/${TX_CFG.itemId}/content`,{headers:{Authorization:'Bearer '+token}});
+    if(!r.ok) throw new Error('Graph '+r.status);
+    parseWorkbook(await r.arrayBuffer(),'SharePoint (live)');
+  }catch(e){
+    asOf.textContent='Live pull unavailable ('+e.message+'). Pick the workbook to refresh instead.';
+    txFileEl.click();
+  }
+}
+document.getElementById('txRefresh').addEventListener('click',refreshLive);
+txFileEl.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=ev=>{try{parseWorkbook(ev.target.result,f.name);}catch(err){asOf.textContent='Could not read file: '+err.message;}};rd.readAsArrayBuffer(f);});
 </script>
 </body>
 </html>
