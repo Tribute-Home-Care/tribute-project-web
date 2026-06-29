@@ -761,10 +761,12 @@ function parseWorkbook(buf,srcName){
   const pct=v=>{ v=Math.abs(v)<=1?v*100:v; return v; };
   // pick the value in [lo,hi] closest to the right side of the row (latest month)
   const pick=(row,lo,hi)=>{ const ns=nums(row).filter(n=>n>=lo&&n<=hi); return ns.length?ns[ns.length-1]:null; };
-  let hits=0;
+  let hits=0; const done={};
+  // first (topmost) match wins — the company-financials section sits at the top of the KPI Tracker,
+  // so initiative rows like "Tier 1 Revenue" further down never clobber the company totals.
+  const set=(i,val)=>{ if(val!=null && !done[i]){ KPIS[i].val=val; done[i]=true; hits++; } };
   rows.forEach(row=>{
     const label=row.map(c=>String(c||'')).join(' ').toLowerCase();
-    const set=(i,val)=>{ if(val!=null){ KPIS[i].val=val; hits++; } };
     if(/net income/.test(label)){ const v=pick(row,-1,100); const p=v!=null?pct(v):null; if(p!=null&&p>=-50&&p<=50) set(3,p.toFixed(1)+'%'); }
     else if(/gross margin/.test(label)){ const v=pick(row,-1,100); const p=v!=null?pct(v):null; if(p!=null&&p>=10&&p<=80) set(1,p.toFixed(1)+'%'); }
     else if(/contribution margin/.test(label)){ const v=pick(row,-1,100); const p=v!=null?pct(v):null; if(p!=null&&p>=0&&p<=70) set(2,p.toFixed(1)+'%'); }
