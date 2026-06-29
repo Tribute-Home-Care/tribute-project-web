@@ -584,7 +584,7 @@ const VISIONS = [
 const KPIS = [
   {label:"Revenue · 12-mo run rate", val:"$34.2M", goal:"Budget $32.3M", good:true,  color:"#3f7d6e"},
   {label:"Gross Margin %",           val:"32.9%",  goal:"Goal 32.8%",    good:true,  color:"#b5654a"},
-  {label:"Contribution Margin %",    val:"19.0%",  goal:"Goal 20.0%",    good:false, color:"#c08a3e"},
+  {label:"Contribution Margin %",    val:"20.0%",  goal:"Goal 20.0%",    good:true,  color:"#c08a3e"},
   {label:"Net Income %",             val:"7.6%",   goal:"Goal 6.2%",     good:true,  color:"#2f7d50"},
 ];
 
@@ -774,13 +774,13 @@ async function graphToken(){
 }
 function parseWorkbook(buf,srcName){
   const wb=XLSX.read(new Uint8Array(buf),{type:'array'});
-  const sheet=wb.SheetNames.find(n=>/kpi/i.test(n))||wb.SheetNames[wb.SheetNames.length-1];
+  const sheet=wb.SheetNames.find(n=>/kpi\s*tracker/i.test(n))||wb.SheetNames.find(n=>/^\s*kpi/i.test(n))||wb.SheetNames[wb.SheetNames.length-1];
   const rows=XLSX.utils.sheet_to_json(wb.Sheets[sheet],{header:1,blankrows:false});
   // collect ALL numbers in a row (not just the last — that caused mangled/concatenated values)
-  const nums=row=>row.map(c=>{ if(typeof c==='number') return c; const s=String(c).replace(/[, $]/g,''); return /^-?\d+(\.\d+)?%?$/.test(s)?parseFloat(s):null; }).filter(n=>n!=null);
+  const nums=row=>row.map(c=>{ if(typeof c==='number') return c; const s=String(c).replace(/[\s,$]/g,''); return /^-?\d+(\.\d+)?%?$/.test(s)?parseFloat(s):null; }).filter(n=>n!=null);
   const pct=v=>{ v=Math.abs(v)<=1?v*100:v; return v; };
   // pick the value in [lo,hi] closest to the right side of the row (latest month)
-  const pick=(row,lo,hi)=>{ const ns=nums(row).filter(n=>n>=lo&&n<=hi); return ns.length?ns[ns.length-1]:null; };
+  const pick=(row,lo,hi)=>{ const ns=nums(row).filter(n=>n>=lo&&n<=hi); return ns.length?ns[0]:null; };
   let hits=0; const done={};
   // first (topmost) match wins — the company-financials section sits at the top of the KPI Tracker,
   // so initiative rows like "Tier 1 Revenue" further down never clobber the company totals.
