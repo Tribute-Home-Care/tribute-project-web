@@ -205,34 +205,53 @@
     padding:9px 18px; font-size:13px; font-weight:700; color:var(--stone-700); cursor:pointer; font-family:inherit;}
   .showall:hover{ border-color:var(--terra); color:var(--terra);}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.28.1/lib/msal-browser.min.js"></script>
 </head>
 <body>
 <div id="gate" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(900px 500px at 70% -10%,#fdf4ec 0%,transparent 60%),#faf8f5;
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;">
-  <form id="gateForm" style="background:#fff;border:1px solid #e8e1d7;border-radius:18px;padding:34px 32px;width:min(360px,90vw);
+  <div id="gateCard" style="background:#fff;border:1px solid #e8e1d7;border-radius:18px;padding:34px 32px;width:min(380px,90vw);
     box-shadow:0 18px 50px -24px rgba(60,50,35,.4);text-align:center;">
     <div style="font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#b5654a;font-weight:700;margin-bottom:10px;">Tribute Home Care</div>
-    <h2 style="font-size:22px;font-weight:800;color:#2c261d;margin:0 0 6px;letter-spacing:-.02em;">The Build</h2>
-    <p style="font-size:13px;color:#5f5547;margin:0 0 18px;">Enter the password to view the project timeline.</p>
-    <input id="gatePw" type="password" autocomplete="off" placeholder="Password" autofocus
-      style="width:100%;padding:11px 14px;border:1px solid #d6ccbd;border-radius:10px;font-size:15px;outline:none;margin-bottom:10px;background:#faf8f5;">
-    <button type="submit" style="width:100%;padding:11px;border:0;border-radius:10px;background:#2c261d;color:#fff;
-      font-size:14px;font-weight:700;cursor:pointer;">Unlock</button>
-    <div id="gateErr" style="display:none;color:#b5654a;font-size:12.5px;font-weight:600;margin-top:10px;">Incorrect password — try again.</div>
-  </form>
+    <h2 style="font-size:22px;font-weight:800;color:#2c261d;margin:0 0 6px;letter-spacing:-.02em;">Project Web</h2>
+    <p style="font-size:13px;color:#5f5547;margin:0 0 20px;line-height:1.5;">Sign in with your Tribute account to continue. Access is limited to people who can open the Transformation workbook in SharePoint.</p>
+    <button id="gateBtn" style="width:100%;padding:12px;border:0;border-radius:10px;background:#2c261d;color:#fff;
+      font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:9px;">
+      <svg width="16" height="16" viewBox="0 0 23 23" aria-hidden="true"><path fill="#f25022" d="M1 1h10v10H1z"/><path fill="#7fba00" d="M12 1h10v10H12z"/><path fill="#00a4ef" d="M1 12h10v10H1z"/><path fill="#ffb900" d="M12 12h10v10H12z"/></svg>
+      Sign in with Microsoft</button>
+    <div id="gateErr" style="display:none;color:#b5654a;font-size:12.5px;font-weight:600;margin-top:12px;line-height:1.4;"></div>
+  </div>
 </div>
 <script>
 (function(){
-  var PW="Tribute2026!";
-  var gate=document.getElementById('gate');
+  var CFG={clientId:"b1a3919b-e7a1-406d-80d7-7e68fd8f82aa",tenantId:"3277c56b-67a5-4dbc-9f82-474b19e15eb3",
+    driveId:"b!qXCNqBcvQ0q0QRztrI9qiBrl8ydcrU5HiPGKu1JcV3MjNt8BpMhZQpGv19bL0j7U",itemId:"01YP235Z5AUPARUOB4AFHJNJUEIB7VRQX4",
+    scopes:["Files.Read.All","Sites.Read.All"]};
+  var gate=document.getElementById('gate'), btn=document.getElementById('gateBtn'), err=document.getElementById('gateErr');
   function unlock(){ gate.style.display='none'; document.body.style.overflow=''; }
-  if(sessionStorage.getItem('tpw-ok')==='1'){ unlock(); }
-  else { document.body.style.overflow='hidden'; }
-  document.getElementById('gateForm').addEventListener('submit',function(e){
-    e.preventDefault();
-    if(document.getElementById('gatePw').value===PW){ sessionStorage.setItem('tpw-ok','1'); unlock(); }
-    else { document.getElementById('gateErr').style.display='block'; document.getElementById('gatePw').value=''; document.getElementById('gatePw').focus(); }
+  if(sessionStorage.getItem('tpw-ok')==='1'){ unlock(); return; }
+  document.body.style.overflow='hidden';
+  var app=null;
+  async function getApp(){ if(app) return app;
+    app=new msal.PublicClientApplication({auth:{clientId:CFG.clientId,authority:"https://login.microsoftonline.com/"+CFG.tenantId,redirectUri:"https://tribute-home-care.github.io/tribute-project-web/"},cache:{cacheLocation:"sessionStorage"}});
+    await app.initialize(); return app; }
+  function fail(msg){ btn.disabled=false; btn.style.opacity='1'; btn.lastChild.textContent=' Sign in with Microsoft'; err.textContent=msg; err.style.display='block'; }
+  btn.addEventListener('click',async function(){
+    if(typeof msal==='undefined'){ fail('Sign-in library failed to load — check your connection and reload.'); return; }
+    err.style.display='none'; btn.disabled=true; btn.style.opacity='.6'; btn.lastChild.textContent=' Signing in…';
+    try{
+      var a=await getApp();
+      var acct=a.getAllAccounts()[0];
+      if(!acct){ var lr=await a.loginPopup({scopes:CFG.scopes}); acct=lr.account; }
+      var tok;
+      try{ tok=(await a.acquireTokenSilent({scopes:CFG.scopes,account:acct})).accessToken; }
+      catch(e){ tok=(await a.acquireTokenPopup({scopes:CFG.scopes})).accessToken; }
+      var r=await fetch("https://graph.microsoft.com/v1.0/drives/"+CFG.driveId+"/items/"+CFG.itemId+"?select=id",{headers:{Authorization:"Bearer "+tok}});
+      if(r.ok){ sessionStorage.setItem('tpw-ok','1'); unlock(); }
+      else if(r.status===403||r.status===404){ fail("Your account doesn't have access to the Transformation workbook in SharePoint. Ask an owner to share it with you."); }
+      else { fail("Couldn't verify access (error "+r.status+"). Please try again."); }
+    }catch(e){ fail(/popup/i.test(e.message||'')?'The sign-in popup was blocked or closed — allow popups and try again.':'Sign-in failed — please try again.'); }
   });
 })();
 </script>
